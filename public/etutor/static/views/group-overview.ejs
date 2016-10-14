@@ -1,0 +1,16 @@
+<% if ( items.group.length > 0 ) { %>			
+		<ul>
+		<% items.group.forEach( function ( member ){ %>
+			<% if (member.username !== items.username) { %>
+				<li class="user<%= member.id %>">
+					<a href="/users/view/<%= member.username %>">
+						<img width="20" src="/static/img/user-icons/user-<%= member.id %>_big.png" /> <%= member.firstname %> <%= member.name %>
+						<% if(member.status.online){ %>
+							(online)
+						<% } %>
+					</a>
+				</li>	
+			<% } %>					
+		<% }); %>
+		</ul>
+	<% } %>

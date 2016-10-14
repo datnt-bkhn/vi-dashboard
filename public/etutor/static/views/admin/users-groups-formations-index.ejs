@@ -1,0 +1,65 @@
+<% layout( '../admin-layout' ) -%>
+
+<h2>Group formations </h2>
+<a href="/admin/users/groups/formations/create" class="label label-primary"><span class="glyphicon glyphicon-plus"></span> Create new</a>
+<br>
+<br>
+<div id="tab"></div>
+<div id="preview"></div>
+
+<script>
+$(document).ready (function () { 
+	$('#tab').bootstrapTable({
+    data: JSON.parse('<%-JSON.stringify( items )%>'),
+    //showColumns : true,
+    checkboxHeader : true,
+   // cardView:true, // mobile view
+    columns: [
+		  { field: 'title', title: 'Formation', formatter: titleFormatter, sortable : true, order: 'asc', searchable: true }, 
+		  { field: 'method', title: 'Formation algorithm', visible:true, sortable : true,  searchable : true }, 
+		  { field: 'groups', title: 'Number of groups', visible:true, sortable : true,  searchable : true }, 
+			{ field: 'persons', title: 'Number of users', visible:true, sortable : true, searchable : true },
+			{ field: 'updated_at', title: 'last update', formatter: dateFormatter, sortable : true, order: 'asc', searchable: true },
+			{ field: 'operate', title: '', formatter: operateFormatter, visible:true, sortable : false, searchable : false }  
+    ]
+	});
+});
+
+
+function titleFormatter(value, row, index) { 
+	return '<a href="javascript:previewFormation('+index+');"><span class="glyphicon glyphicon-plus"></span> '+row.title+'</a>';
+}	
+
+function operateFormatter(value, row, index) {
+	return [
+		/*'<a href="/admin/scripts/templates/instantiate/'+row._id+'" title="Create instance of script template">',
+		'<i class="glyphicon glyphicon-export"></i> instantiate',
+		'</a><br>',*/
+		'<a href="/admin/users/groups/formations/destroy/'+row._id+'" title="Remove group formation">',
+		'<i class="glyphicon glyphicon-remove"></i> remove',
+		'</a>'
+	].join(''); 
+}
+
+function dateFormatter(value, row, index) { 
+	return moment(value).fromNow();
+}	
+
+
+/*
+ * Displays a group formation with all groups and its members
+ **/
+function previewFormation(index){
+	var data = { items: JSON.parse('<%-JSON.stringify( items )%>')[index].formation };
+	require(['text!../views/admin/users-groups-formations-single.ejs', 'ejs'], function(thetemplate) { 
+		var 
+			html = ejs.render(thetemplate, data)
+		;
+		$('#preview').html( '<h4>Preview formation: '+JSON.parse('<%-JSON.stringify( items )%>')[index].title+'</h4>' ).append(html);
+	});			
+}
+
+
+
+</script>
+

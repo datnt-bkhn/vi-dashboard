@@ -1,0 +1,282 @@
+<% layout( '../admin-layout' ) -%>
+
+
+<div class="col-md-10">
+<h2>Edit video file: <%= items.title %></h2>
+<br>
+
+<script>
+/*
+todo:
+- 
+*/
+$(document).ready(function() {
+
+	$('.datetimepicker').datetimepicker({
+      //viewMode: 'years',
+      format: 'YYYY'
+  });
+
+	var data = JSON.parse('<%-JSON.stringify( items )%>');
+	//alert(JSON.stringify(data))
+
+	/*
+	 * Call server to extract new still images from the video file
+	 * status: xxx
+	 */
+	$('#createStills').click(function(){
+		var id= data._id;
+		$.get('/admin/videos/files/create-stills/'+id, function(d){
+			for(var i = 1; i < 9; i++){
+				var o = new Image(); 
+				// animate transition	if image is loaded				
+				$(o) 
+					.attr('src', '/static/img/stills/still_'+data.video.split('/').splice(-1)[0].replace('.mp4','')+'_'+i+'.png')
+					.addClass('slide ov-'+id)
+					.css({width:'50%'})
+					//.css({ height:'100vh' })
+					.unbind('load')
+					.bind('load', function(e){ //alert(JSON.stringify(t))
+						//$('.stills').append(o);
+					})
+					.appendTo('.stills');
+				//$('.stisls').find('img#id'+i).attr('src', '/static/img/stills/still_'+id+'_'+i+'.png');
+			}
+		})
+	});
+	
+	/*
+	 * Collect form data and POST it to the server
+	 */
+	var frmMeta = $('#metadataForm');
+	frmMeta.submit(function(e) { 
+		e.preventDefault(); 
+		var 
+			arr = [],
+			video = $('input[name=video]').val()
+			;
+		for(var i = 1; i < 5; i++){
+			arr.push( 'still_'+video.split('/').splice(-1)[0].replace('.mp4','')+'_'+i+'.png' );
+		} 
+		var annotations = {};
+		annotations.slides = JSON.parse( $('textarea#slides').val() );
+		var data = {
+				title: $('input[name=title]').val(),
+				creator: $('input[name=creator]').val(),
+				subject: $('input[name=subject]').val(),
+				description: $('textarea#description').val(),
+				publisher: $('input[name=publisher]').val(),
+				contributor: $('input[name=contributor]').val(),
+				type: $('input[name=type]').val(),
+				mimetype: $('input[name=mimetype]').val(),
+				source: $('input[name=source]').val(),
+				language: $('input[name=language]').val(),
+				relation: $('input[name=relation]').val(),
+				coverage: $('input[name=coverage]').val(),
+				rights: $('input[name=rights]').val(),
+				date: $('input[name=date]').val(),
+				license: $('select option:selected').val(),
+				presentation_type: $('select[name=presentation-type] option:selected').val(),
+				annotations: annotations,
+				video: video, // url
+				length: $('input[name=length]').val(),
+				size: $('input[name=size]').val(),
+				thumbnail: arr, // xxx
+				institution: $('input[name=institution]').val(),
+				category: $('input[name=category]').val(),
+				tags: $('input[name=tags]').val().split(',') // Array
+			};
+		
+		$.ajax({
+			type: frmMeta.attr('method'),
+			url: frmMeta.attr('action'),
+			contentType: "application/json",
+			data: JSON.stringify(data),
+			error: function(xhr) {
+				console.log(xhr)
+			},
+			success: function(res) { 
+				// redirect 
+				window.location.href = '/admin/videos/files';
+			}
+		});
+		return false;
+	});       
+	   
+});
+</script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+
+
+
+<div class="row">
+	<div class="col-md-8 edit-form">
+    <form 
+    	id="metadataForm" 
+    	action="/admin/videos/files/update/<%= items._id %>" 
+    	method="POST" 
+    	accept-charset="utf-8"
+    	>
+		<div class="input-group input-group-xs">
+			<span class="input-group-addon" id="sizing-addon1">Title</span>
+			<input type="text" class="form-control" placeholder="title" aria-describedby="sizing-addon1" name="title" value="<%= items.title %>">
+    </div>
+    <br>
+    <div class="input-group input-group-xs">
+			<span class="input-group-addon" id="sizing-addon1">Video URL</span>
+			<input id="url" type="text" class="form-control" placeholder="video" aria-describedby="sizing-addon1" name="video" value="<%= items.video %>">
+    </div>
+    <br>
+    <div class="input-group input-group-xs">
+			<span class="input-group-addon" id="sizing-addon1">Creator</span>
+			<input type="text" class="form-control" placeholder="creator" aria-describedby="sizing-addon1" name="creator" value="<%= items.creator %>">
+    </div>
+    <br>
+    <div class="input-group input-group-xs">
+			<span class="input-group-addon" id="sizing-addon1">Institution</span>
+			<input type="text" class="form-control" placeholder="institution" aria-describedby="sizing-addon1" name="institution" value="<%= items.institution %>">
+    </div>
+    <br>
+    <div class="form">
+			<span class="" id="sizing-addon1"><strong>Description</strong></span>
+			<textarea class="form-control" rows="4" id="description" name="description"><%= items.description %></textarea>
+    </div>
+    <br>
+    <div class="input-group input-group-xs">
+			<span class="input-group-addon" id="sizing-addon1">Category</span>
+			<input type="text" class="form-control" placeholder="category" aria-describedby="sizing-addon1" name="category" value="<%= items.category %>">
+    </div>
+    <br>
+    <div class="input-group input-group-xs">
+			<span class="input-group-addon" id="sizing-addon1">Tags</span>
+			<input type="text" class="form-control" placeholder="tags1, tags2, ..." aria-describedby="sizing-addon1" name="tags" value="<%= items.tags %>">
+    </div>
+    <br>
+     <div class="form">
+			<span class="" id="sizing-addon1"><strong>License</strong></span>
+			<select id="license">
+				<option <%= items.license == 'cc-by' ? 'selected' : '' %> value="cc-by">Creative Commons - attribution (cc-by)</option>
+				<option <%= items.license == 'pd' ? 'selected' : '' %> value="pd">Public Domain (pd)</option>
+				<option <%= items.license == 'cr' ? 'selected' : '' %> value="cr">Copy Right Restricted</option>
+				<option <%= items.license == 'nn' ? 'selected' : '' %> value="nn">Unknown</option>
+			</select>
+    </div>
+    <br>
+    <br>
+    <%= items.presentation_type %>
+    <div class="form">
+			<span class="" id="sizing-addon1"><strong>Presentation</strong></span>
+			<select id="presentation-type" name="presentation-type">
+				<option <%= items.presentation_type == 'video-only' ? 'selected' : '' %> value="video-only">Video only</option>
+				<option <%= items.presentation_type == 'video-slides' ? 'selected' : '' %> value="video-slides">Video and slides</option>
+				<option <%= items.presentation_type == 'audio-only' ? 'selected' : '' %> value="audio-only">Audio only</option>
+				<option <%= items.presentation_type == 'audio-slides' ? 'selected' : '' %> value="audio-slides">Audio and slides</option>			
+			</select>
+    </div>
+    <br>
+    <div class="form">
+			<span class="" id="sizing-addon1"><strong>JSON-Data for Slides</strong></span>
+			<textarea class="form-control" rows="4" id="slides" name="slides"><%= JSON.stringify( items.annotations.slides ) %></textarea>
+    </div>
+    <br>
+    <div class="stills row">
+			<div class="col-xs-4 col-md-4">
+				<button class="btn btn-secondary" id="createStills">Generate thumbnails</button>
+			</div>	
+			<% items.thumbnail.forEach(function(item){ %>
+				<div class="col-xs-2 col-md-2">
+				<div class="thumbnail">
+					<img width="100%" height="100%" src="/static/img/stills/<%= item %>" />
+				</div>
+				</div>
+			<% })%>
+		</div>
+		<br/>
+    <!-- Additional Meta Data -->
+     
+    <a class="" role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+		<h4><span class="glyphicon glyphicon-collapse-down"></span> Additional Fields</h4>
+		</a>
+		<div class="collapse" id="collapseExample">
+			<br>
+			<div class="input-group input-group-xs">
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Publisher</span>
+					<input type="text" class="form-control" placeholder="publisher" aria-describedby="sizing-addon1" name="publisher" value="<%= items.publisher %>">
+				</div>
+				<br>
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Contributor</span>
+					<input type="text" class="form-control" placeholder="contributor" aria-describedby="sizing-addon1" name="contributor" value="<%= items.contributor %>">
+				</div>
+				<br>
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Subject</span>
+					<input type="text" class="form-control" placeholder="subject" aria-describedby="sizing-addon1" name="subject" value="<%= items.subject %>">
+				</div>
+				<br>
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Coverage</span>
+					<input type="text" class="form-control" placeholder="coverage" aria-describedby="sizing-addon1" name="coverage" value="<%= items.coverage %>">
+				</div>
+				<br>
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Source</span>
+					<input type="text" class="form-control" placeholder="source" aria-describedby="sizing-addon1" name="source" value="<%= items.source %>">
+				</div>
+				<br>
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Rights</span>
+					<input type="text" class="form-control" placeholder="rights" aria-describedby="sizing-addon1" name="rights" value="<%= items.rights %>">
+				</div>
+				<br>		
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Year of creation</span>
+					<input type="text" class="datetimepicker form-control" placeholder="date" aria-describedby="sizing-addon1" name="date" value="<%= items.date %>">
+				</div>
+				<br>
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Language</span>
+					<input type="text" class="form-control" placeholder="language" aria-describedby="sizing-addon1" name="language" value="<%= items.language %>">
+				</div>
+				<br>
+				<div class="input-group input-group-xs">
+					<span class="input-group-addon" id="sizing-addon1">Relation</span>
+					<input type="text" class="form-control" placeholder="relation" aria-describedby="sizing-addon1" name="relation" value="<%= items.relation %>">
+				</div> 
+				<br>
+				<% id = Math.random()*9999 %>
+				<input type="input" name="mimetype" value="<%= items.mimetype %>" />
+				<input type="input" name="format" value="<%= items.format %>" />
+				<input type="input" name="length" value="0" />
+				<input type="input" name="type" value="video" />
+				<input type="input" name="size" value="<%= items.size %>" />
+			</div>
+		</div>
+    
+   
+    <br><br>
+    <div class="buttons">
+      <button id="save-btn" class="btn btn-primary" type="submit">save</button>  
+      <a href="/admin/videos/files">cancel</a>
+      <a class="alert-btn right" href="/admin/videos/files/destroy/<%= items._id %>" title="Delete this video file">delete</a>
+    </div>
+  </form>
+</div>
+<div class="col-md-4">
+	
+</div>
+</div>
+<!--<img id="id1" />
+		<img id="id2" />
+		<img id="id3" />
+		<img id="id4" />
+		<img id="id5" />
+		<img id="id6" />
+		<img id="id7" />
+		<img id="id8" />-->
+
+
+
+ 
+

@@ -1,0 +1,29 @@
+<% layout( '../admin-layout' ) -%>
+
+<div class="col-md-10">
+<h2>Groups</h2>
+<div id="table1"></div>
+</div>
+<script type="text/javascript"> 
+$(document).ready (function () { 
+	$('#table1').bootstrapTable({
+    data: JSON.parse('<%-JSON.stringify( items )%>'),
+    //height:'500',
+    showColumns : true,
+    //checkboxHeader : true,
+    // search
+    search: true,
+    strictSearch: true,
+    trimOnSearch:true,
+    columns: [
+		  { field: 'id', title: 'Group-ID', sortable : true, order: 'asc', searchable: true }, 
+		  { field: 'description', title: 'Description',  sortable : true, order: 'asc',searchable : true }, 
+		  { field: 'persons', title: 'Group size', visible:true, sortable : true, searchable : true }, 
+		  { field: 'videos', title: 'Videos', visible:true, sortable : true, /*formatter: videoFormatter,*/ order: 'asc',searchable : true }, 
+		//  { field: 'users', title: 'Users', visible:true, sortable : true, formatter: userFormatter, order: 'asc',searchable : true }, 
+    ]
+	});
+});
+</script>
+	
+	

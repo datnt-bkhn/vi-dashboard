@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Vi-Lab</title>
+<meta name='robots' content='noindex,nofollow' /> 
+
+<link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+<link rel="icon" href="/static/img/favicon.ico">
+<link rel="stylesheet" href="/static/css/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/css/bootstrap/dist/css/bootstrap-theme.min.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:400,700&subset=latin,latin-ext' type='text/css'>
+<link rel="stylesheet" href="/static/css/jquery-ui-1.10.3.custom.css">
+<link rel="stylesheet" href="/static/css/select2.css">
+<link rel="stylesheet" href="/static/css/select2-bootstrap.css">
+<link rel='stylesheet' href='/static/css/theresienstadt.css' type='text/css' media='all' />
+
+<script src="/static/lib/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script src="/static/lib/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+<script src="/static/css/bootstrap/dist/js/bootstrap.js" type="text/javascript"></script>
+<script src="/static/lib/bootstrap-switch.min.js"></script>
+<script src='/static/lib/moment.min.js'></script>
+<script src="/static/lib/markdown.min.js"></script>
+<script src="/static/lib/ejs.js" type="text/javascript" ></script>
+<script src="/static/lib/jquery-image-loader.js"></script>
+
+<script src="/static/lib/select2.min.js"></script>
+<script src='/static/lib/typeahead.bundle.js'></script>
+
+
+<script src="/static/lib/jquery.ui.core.js" type="text/javascript"></script> 
+<script src="/static/lib/jquery.ui.widget.js" type="text/javascript"></script> 
+<script src="/static/lib/jquery.ui.mouse.js" type="text/javascript"></script> 
+<script src="/static/lib/jquery.ui.position.js" type="text/javascript"></script> 
+<script src="/static/lib/jquery.ui.accordion.js" type="text/javascript"></script> 
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/static/lib/require.js" data-main="/static/lib/requirejs-conf"></script>
+
+</head>
+
+<body>
+<div id="xxxwrapper"></div>
+
+<!-- Navigation
+================================================== -->
+<% include navigation %>
+
+<!-- Container
+================================================== -->
+	<content>
+	<div id="page" style="overflow:visible;">
+	<%- body %>
+	</div>
+	</content>
+
+
+<!-- Footer
+================================================== -->
+<% include footer %>
+
+<script>
+// render markdown
+		$('.mark').each(function(i, val){
+				$(val).html(markdown.toHTML($(val).text()))
+		});
+
+</script>
+
+
+</body>
+</html>
+
