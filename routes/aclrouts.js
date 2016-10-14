@@ -10,9 +10,60 @@ module.exports = function(db, app) {
 		module = {},
 		mongoose = require( 'mongoose' ),
 	 	Log  = mongoose.model( 'Log' ),
+	 	LogExt  = mongoose.model( 'LogExt' ),
 	 	fs = require('node-fs'),
 	 	get_ip = require('ipware')().get_ip
 	 	;
+	
+	// index html page ~ home
+	app.get('/', function(req, res) { 
+		LogExt
+			.find({})
+			.limit(100)
+			.exec(function(err, data){
+				if(err){
+					res.send(err);
+				}
+				res.render('index', {items: data});
+			});	
+	});
+	
+	// output route for JSON 
+	app.get('/json/log', function(req, res) { 
+		
+		// trivial approach, not working with large data sets
+		LogExt
+			.find({ group:'e'})  // only group e will be selected
+			.limit(100) // show only the first 100 entries
+			.exec(function(err, data){
+				if(err){
+					res.send(err)
+				}
+				res.json( data );  // output as json
+		});
+		
+			
+		// trivial approach using streams, more suitable for large data sets
+		/*
+		var query = Log.find({}).stream();
+		query.on('data', function (doc) {
+				console.log(doc)
+				//log.write( JSON.stringify( doc ) );
+		}).on('error', function (err) {
+				console.log(err);
+		}).on('close', function () {
+				console.log('@Log :: closed stream');
+				res.send('streams data');
+		});
+		return;
+		*/
+		
+	});	// end get /json/log
+	
+	
+	
+	
+	
 	
 	// route for saving a log from the video player to the database
 	app.post('/log', function(req, res) { console.log(req.sessionID)
@@ -62,37 +113,7 @@ module.exports = function(db, app) {
 	var log = fs.createWriteStream('logfile.debug', {'flags': 'a'}); // use {'flags': 'a'} to append and {'flags': 'w'} to erase and write a new file
 	
 	
-	// 
-	app.get('/json/log', function(req, res) { 
-		
-		// trivial approach, not working with large data sets
-		Log
-			.find({})
-			.limit(100)
-			.exec(function(err, data){
-				if(err){
-					res.send(err)
-				}
-				res.json( data ); 
-		});
-		
-			
-		// trivial approach using streams, more suitable for large data sets
-		/*
-		var query = Log.find({}).stream();
-		query.on('data', function (doc) {
-				console.log(doc)
-				//log.write( JSON.stringify( doc ) );
-		}).on('error', function (err) {
-				console.log(err);
-		}).on('close', function () {
-				console.log('@Log :: closed stream');
-				res.send('streams data');
-		});
-		return;
-		*/
-		
-	});	// end get /json/log
+	
 	
 
 

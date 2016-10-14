@@ -1,0 +1,16 @@
+
+
+<div class="container">
+	In the code of the template /public/etutor/static/views/index.ejs you will finde some explamples on how to use .ejs
+<br><br>
+		Output the data in raw format (JSON):<br><%- items[0] %> 
+		
+		<br><br><br><br>
+		Output the data as text (JSON): <br><%= items[10].utc %> 
+		
+</div>
+
+<script>
+	// load data as JSON for further processing
+	var test =  <%-JSON.stringify(items,null,'\t') %>;
+</script>
